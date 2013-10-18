@@ -12,18 +12,18 @@ namespace PBDesk.EFRepository
 
         #region Get/Read Methods
 
-        IQueryable<T> GetAll<T>() where T : class;
+        IQueryable<T> GetAll<T>() where T : Entity;
 
-        T GetSingle<T>(object Id) where T : class;
-        T GetSingle<T>(Expression<Func<T, bool>> expression) where T : class;
+        T GetSingle<T>(object Id) where T : Entity;
+        T GetSingle<T>(Expression<Func<T, bool>> expression) where T : Entity;
 
-        IQueryable<T> Filter<T>(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, string includeProperties = "") where T : class;
-        IQueryable<T> Filter<T>(Expression<Func<T, bool>> filter, out int total, int index = 0, int size = 50) where T : class;
+        IQueryable<T> Filter<T>(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, string includeProperties = "") where T : Entity;
+        IQueryable<T> Filter<T>(Expression<Func<T, bool>> filter, out int total, int index = 0, int size = 50) where T : Entity;
 
-        bool Contains<T>(Expression<Func<T, bool>> predicate) where T : class;
+        bool Contains<T>(Expression<Func<T, bool>> predicate) where T : Entity;
 
-        T Find<T>(params object[] keys) where T : class;
-        T Find<T>(Expression<Func<T, bool>> predicate) where T : class;
+        T Find<T>(params object[] keys) where T : Entity;
+        T Find<T>(Expression<Func<T, bool>> predicate) where T : Entity;
 
         #endregion
 
@@ -31,11 +31,11 @@ namespace PBDesk.EFRepository
 
         #region Insert Light Methods
 
-        void InsertLite<T>(T obj) where T : class;
+        void InsertLite<T>(T obj) where T : Entity;
 
         #endregion
 
-        T Insert<T>(T obj) where T : class;
+        T Insert<T>(T obj) where T : Entity;
 
         #endregion
 
@@ -43,11 +43,11 @@ namespace PBDesk.EFRepository
 
         #region Update Light Methods
 
-        bool UpdateLite<T>(T obj, string primaryKeyName) where T : class;
+        bool UpdateLite<T>(T obj, string primaryKeyName) where T : Entity;
 
         #endregion
 
-        int Update<T>(T obj, string primaryKeyName) where T : class;
+        int Update<T>(T obj, string primaryKeyName) where T : Entity;
 
         #endregion
 
@@ -55,15 +55,15 @@ namespace PBDesk.EFRepository
 
         #region Delete Light Methods
 
-        void DeleteLite<T>(object id) where T : class;
-        void DeleteLite<T>(T obj) where T : class;
-        void DeleteLite<T>(Expression<Func<T, bool>> predicate) where T : class;
+        void DeleteLite<T>(object id) where T : Entity;
+        void DeleteLite<T>(T obj) where T : Entity;
+        void DeleteLite<T>(Expression<Func<T, bool>> predicate) where T : Entity;
 
         #endregion
 
-        int Delete<T>(object id) where T : class;
-        int Delete<T>(T obj) where T : class;
-        int Delete<T>(Expression<Func<T, bool>> predicate) where T : class;
+        int Delete<T>(object id) where T : Entity;
+        int Delete<T>(T obj) where T : Entity;
+        int Delete<T>(Expression<Func<T, bool>> predicate) where T : Entity;
 
         #endregion
 

@@ -11,7 +11,7 @@ using PBDesk.EFRepository.Exceptions;
 
 namespace PBDesk.EFRepository
 {
-    public class Repository<T> : IRepository where T : class
+    public class Repository<T> : IRepository where T : IEntity
     {
 
         protected internal DbContext context = null;
@@ -25,7 +25,7 @@ namespace PBDesk.EFRepository
         /// Gets all objects from database
         /// </summary>
         /// <returns></returns>
-        public IQueryable<T> GetAll<T>() where T : class
+        public IQueryable<T> GetAll<T>() where T : Entity
         {
             try
             {
@@ -41,7 +41,7 @@ namespace PBDesk.EFRepository
         /// Gets object from database by Id
         /// </summary>
         /// <returns></returns>
-        public T GetSingle<T>(object Id) where T : class
+        public T GetSingle<T>(object Id) where T : Entity
         {
             try
             {
@@ -59,7 +59,7 @@ namespace PBDesk.EFRepository
         /// <typeparam name="T"></typeparam>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public T GetSingle<T>(System.Linq.Expressions.Expression<Func<T, bool>> expression) where T : class
+        public T GetSingle<T>(System.Linq.Expressions.Expression<Func<T, bool>> expression) where T : Entity
         {
             try
             {
@@ -72,7 +72,7 @@ namespace PBDesk.EFRepository
             
         }
 
-        //public IQueryable<T> Filter<T>(System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : class
+        //public IQueryable<T> Filter<T>(System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : Entity
         //{
         //    return context.Set<T>().Where<T>(predicate).AsQueryable<T>();            
         //}
@@ -82,7 +82,7 @@ namespace PBDesk.EFRepository
         /// </summary>
         /// <param name="predicate">Specified a filter</param>
         /// <returns></returns>
-        public IQueryable<T> Filter<T>(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, string includeProperties = "") where T : class
+        public IQueryable<T> Filter<T>(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, string includeProperties = "") where T : Entity
         {
             try
             {
@@ -123,7 +123,7 @@ namespace PBDesk.EFRepository
         /// <param name="index">Specified the page index.</param>
         /// <param name="size">Specified the page size</param>
         /// <returns></returns>
-        public IQueryable<T> Filter<T>(Expression<Func<T, bool>> filter, out int total, int index = 0, int size = 50) where T : class
+        public IQueryable<T> Filter<T>(Expression<Func<T, bool>> filter, out int total, int index = 0, int size = 50) where T : Entity
         {
             try
             {
@@ -144,7 +144,7 @@ namespace PBDesk.EFRepository
         /// </summary>
         /// <param name="predicate">Specified the filter expression</param>
         /// <returns></returns>
-        public bool Contains<T>(System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : class
+        public bool Contains<T>(System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : Entity
         {
             try
             {
@@ -161,7 +161,7 @@ namespace PBDesk.EFRepository
         /// </summary>
         /// <param name="keys">Specified the search keys.</param>
         /// <returns></returns>
-        public T Find<T>(params object[] keys) where T : class
+        public T Find<T>(params object[] keys) where T : Entity
         {
             try
             {
@@ -178,7 +178,7 @@ namespace PBDesk.EFRepository
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public T Find<T>(System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : class
+        public T Find<T>(System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : Entity
         {
             try
             {
@@ -196,10 +196,11 @@ namespace PBDesk.EFRepository
         /// </summary>
         /// <param name="obj">Specified a new object to create.</param>
         /// <returns></returns>
-        public T Insert<T>(T obj) where T : class
+        public T Insert<T>(T obj) where T : Entity
         {
             try
             {
+                UpdateAuditInfo<T>(obj);
                 var newEntry = context.Set<T>().Add(obj);
                 SaveChanges();
                 return newEntry;
@@ -214,11 +215,11 @@ namespace PBDesk.EFRepository
         /// Delete the object from database.
         /// </summary>
         /// <param name="t">Specified a existing object to delete.</param>
-        public int Delete<T>(object id) where T : class
+        public int Delete<TEntity>(object id) where TEntity : Entity
         {
             try
             {
-                DeleteLite(id);  //context.Set<T>().Remove(GetSingle<T>(id));
+                DeleteLite <TEntity>(id);  //context.Set<T>().Remove(GetSingle<T>(id));
                 return SaveChanges();
             }
             catch (Exception ex)
@@ -231,7 +232,7 @@ namespace PBDesk.EFRepository
         /// Delete the object from database.
         /// </summary>
         /// <param name="obj">Specified a existing object to delete.</param>
-        public int Delete<T>(T obj) where T : class
+        public int Delete<T>(T obj) where T : Entity
         {
             try
             {
@@ -249,7 +250,7 @@ namespace PBDesk.EFRepository
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public int Delete<T>(System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : class
+        public int Delete<T>(System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : Entity
         {
             try
             {
@@ -267,7 +268,7 @@ namespace PBDesk.EFRepository
         /// </summary>
         /// <param name="obj">Specified the object to save.</param>
         /// <returns></returns>
-        public int Update<T>(T obj, string primaryKeyName = "Id") where T : class
+        public int Update<T>(T obj, string primaryKeyName = "Id") where T : Entity
         {
             try
             {
@@ -316,11 +317,11 @@ namespace PBDesk.EFRepository
                 context.Dispose();
         }
 
-        public void DeleteLite<T>(object id) where T : class
+        public void DeleteLite<TEntity>(object id) where TEntity : Entity
         {
             try
             {
-                context.Set<T>().Remove(GetSingle<T>(id));
+                context.Set<TEntity>().Remove(GetSingle<TEntity>(id));
             }
             catch (Exception ex)
             {
@@ -328,7 +329,7 @@ namespace PBDesk.EFRepository
             }
         }
 
-        public void DeleteLite<T>(T obj) where T : class
+        public void DeleteLite<T>(T obj) where T : Entity
         {
             try
             {
@@ -340,7 +341,7 @@ namespace PBDesk.EFRepository
             }
         }
 
-        public void DeleteLite<T>(Expression<Func<T, bool>> predicate) where T : class
+        public void DeleteLite<T>(Expression<Func<T, bool>> predicate) where T : Entity
         {
             try
             {
@@ -357,10 +358,11 @@ namespace PBDesk.EFRepository
         }
 
 
-        public void InsertLite<T>(T obj) where T : class
+        public void InsertLite<T>(T obj) where T : Entity
         {
             try
             {
+                UpdateAuditInfo<T>(obj);
                 context.Set<T>().Add(obj);
             }
             catch (Exception ex)
@@ -369,7 +371,7 @@ namespace PBDesk.EFRepository
             }
         }
 
-        public bool UpdateLite<T>(T obj, string primaryKeyName = "Id") where T : class
+        public bool UpdateLite<T>(T obj, string primaryKeyName = "Id") where T : Entity
         {
             bool success = false;
             try
@@ -383,6 +385,7 @@ namespace PBDesk.EFRepository
                     throw new ArgumentException("Cannot add or update a null entity.");
                 }
 
+                UpdateAuditInfo<T>(obj);
                 var entry = context.Entry<T>(obj);
 
                 if (entry.State == EntityState.Detached)
@@ -415,5 +418,18 @@ namespace PBDesk.EFRepository
             }
             return success;
         }
+
+        internal void UpdateAuditInfo<T>(T obj) where T: Entity
+        {
+            if (obj != null)
+            {
+                if(obj.LastUpdDate == default(DateTime) )
+                {
+                    obj.LastUpdDate = DateTime.Now;
+                }
+             }
+            
+        }
+
     }
 }
