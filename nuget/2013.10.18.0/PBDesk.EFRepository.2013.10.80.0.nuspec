@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+    <metadata>
+        <id>PBDesk.EFRepository</id>
+        <version>2013.10.16-beta</version>
+        <title>Entity Framework Repository</title>
+        <authors>Pinal Bhatt[PBDesk.com]</authors>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Entity Framework Repository &amp; UOF base for EF6</description>
+        <summary>Entity Framework Repository &amp; UOF base for EF6</summary>
+        <releaseNotes>Entity Framework Repository &amp; UOF base for EF6 for .Net framework 4.5 and 4.5.1</releaseNotes>
+        <dependencies>
+            <group targetFramework=".NETFramework4.5">
+                <dependency id="EntityFramework" version="6.0.0-rc1" />
+            </group>
+        </dependencies>
+        <frameworkAssemblies>
+            <frameworkAssembly assemblyName="System" targetFramework="" />
+            <frameworkAssembly assemblyName="System.Core" targetFramework="" />
+            <frameworkAssembly assemblyName="System.ComponentModel.DataAnnotations" targetFramework="" />
+            <frameworkAssembly assemblyName="System.Data" targetFramework="" />
+            <frameworkAssembly assemblyName="System.Data.DataSetExtensions" targetFramework="" />
+            <frameworkAssembly assemblyName="System.Xml" targetFramework="" />
+            <frameworkAssembly assemblyName="System.Xml.Linq" targetFramework="" />
+            <frameworkAssembly assemblyName="Microsoft.CSharp" targetFramework="" />
+        </frameworkAssemblies>
+    </metadata>
+    <files>
+        <file src="..\PBDeskEdge\Libs\45\PBDesk.EFRepository.dll" target="lib\net45\PBDesk.EFRepository.dll" />
+        <file src="..\PBDeskEdge\Libs\451\PBDesk.EFRepository.dll" target="lib\net451\PBDesk.EFRepository.dll" />
+    </files>
+</package>

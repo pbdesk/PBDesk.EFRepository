@@ -10,6 +10,8 @@ namespace PBDesk.EFRepository
     public interface IRepository : IDisposable
     {
 
+        #region Get/Read Methods
+
         IQueryable<T> GetAll<T>() where T : class;
 
         T GetSingle<T>(object Id) where T : class;
@@ -23,21 +25,53 @@ namespace PBDesk.EFRepository
         T Find<T>(params object[] keys) where T : class;
         T Find<T>(Expression<Func<T, bool>> predicate) where T : class;
 
-        T Insert<T>(T t) where T : class;
+        #endregion
 
-        int Delete<T>(object id) where T : class;
-        int Delete<T>(T t) where T : class;
-        int Delete<T>(Expression<Func<T, bool>> predicate) where T : class;
+        #region Insert Methods
 
-        int Update<T>(T t) where T : class;
+        #region Insert Light Methods
 
-        void InsertLite<T>(T t) where T : class;
-        bool UpdateLite<T>(T t) where T : class;
+        void InsertLite<T>(T obj) where T : class;
+
+        #endregion
+
+        T Insert<T>(T obj) where T : class;
+
+        #endregion
+
+        #region Update Methods
+
+        #region Update Light Methods
+
+        bool UpdateLite<T>(T obj, string primaryKeyName) where T : class;
+
+        #endregion
+
+        int Update<T>(T obj, string primaryKeyName) where T : class;
+
+        #endregion
+
+        #region Delete Methods
+
+        #region Delete Light Methods
+
         void DeleteLite<T>(object id) where T : class;
-        void DeleteLite<T>(T t) where T : class;
+        void DeleteLite<T>(T obj) where T : class;
         void DeleteLite<T>(Expression<Func<T, bool>> predicate) where T : class;
 
+        #endregion
+
+        int Delete<T>(object id) where T : class;
+        int Delete<T>(T obj) where T : class;
+        int Delete<T>(Expression<Func<T, bool>> predicate) where T : class;
+
+        #endregion
+
+        #region Save
+
         int SaveChanges();
+
+        #endregion
 
     }
 }

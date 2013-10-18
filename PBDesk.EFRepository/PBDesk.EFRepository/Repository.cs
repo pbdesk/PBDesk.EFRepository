@@ -27,7 +27,14 @@ namespace PBDesk.EFRepository
         /// <returns></returns>
         public IQueryable<T> GetAll<T>() where T : class
         {
-            return context.Set<T>().AsQueryable().Cast<T>();
+            try
+            {
+                return context.Set<T>().AsQueryable().Cast<T>();
+            }
+            catch(Exception ex)
+            {
+                throw new EFRepositoryException("Error while reading data from database via DbContext.", "Repository.GetAll()", ex);
+            }
         }
 
         /// <summary>
@@ -36,7 +43,14 @@ namespace PBDesk.EFRepository
         /// <returns></returns>
         public T GetSingle<T>(object Id) where T : class
         {
-            return context.Set<T>().Find(Id) as T;
+            try
+            {
+                return context.Set<T>().Find(Id) as T;
+            }
+            catch (Exception ex)
+            {
+                throw new EFRepositoryException("Error while reading data from database via DbContext.", "Repository.GetSingle(Id)", ex);
+            }
         }
 
         /// <summary>
@@ -47,7 +61,15 @@ namespace PBDesk.EFRepository
         /// <returns></returns>
         public T GetSingle<T>(System.Linq.Expressions.Expression<Func<T, bool>> expression) where T : class
         {
-            return GetAll<T>().FirstOrDefault(expression);
+            try
+            {
+                return GetAll<T>().FirstOrDefault(expression);
+            }
+            catch (Exception ex)
+            {
+                throw new EFRepositoryException("Error while reading data from database via DbContext.", "Repository.GetSingle(expression)", ex);
+            }
+            
         }
 
         //public IQueryable<T> Filter<T>(System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : class
@@ -62,26 +84,33 @@ namespace PBDesk.EFRepository
         /// <returns></returns>
         public IQueryable<T> Filter<T>(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, string includeProperties = "") where T : class
         {
-            IQueryable<T> query = context.Set<T>();
+            try
+            {
+                IQueryable<T> query = context.Set<T>();
 
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
+                if (filter != null)
+                {
+                    query = query.Where(filter);
+                }
 
-            foreach (var includeProperty in includeProperties.Split
-                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                query = query.Include(includeProperty);
-            }
+                foreach (var includeProperty in includeProperties.Split
+                    (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProperty);
+                }
 
-            if (orderBy != null)
-            {
-                return orderBy(query).AsQueryable<T>();
+                if (orderBy != null)
+                {
+                    return orderBy(query).AsQueryable<T>();
+                }
+                else
+                {
+                    return query.AsQueryable<T>();
+                }
             }
-            else
+            catch(Exception ex)
             {
-                return query.AsQueryable<T>();
+                throw new EFRepositoryException("Error while reading data from database via DbContext.", "Repository.Filter(filter,orderBy,includeProperties)", ex);
             }
         }
 
@@ -96,11 +125,18 @@ namespace PBDesk.EFRepository
         /// <returns></returns>
         public IQueryable<T> Filter<T>(Expression<Func<T, bool>> filter, out int total, int index = 0, int size = 50) where T : class
         {
-            int skipCount = index * size;
-            var _resetSet = filter != null ? context.Set<T>().Where<T>(filter).AsQueryable() : context.Set<T>().AsQueryable();
-            _resetSet = skipCount == 0 ? _resetSet.Take(size) : _resetSet.Skip(skipCount).Take(size);
-            total = _resetSet.Count();
-            return _resetSet.AsQueryable();
+            try
+            {
+                int skipCount = index * size;
+                var _resetSet = filter != null ? context.Set<T>().Where<T>(filter).AsQueryable() : context.Set<T>().AsQueryable();
+                _resetSet = skipCount == 0 ? _resetSet.Take(size) : _resetSet.Skip(skipCount).Take(size);
+                total = _resetSet.Count();
+                return _resetSet.AsQueryable();
+            }
+            catch(Exception ex)
+            {
+                throw new EFRepositoryException("Error while reading data from database via DbContext.", "Repository.Filter(filter,total,index, size)", ex);
+            }
         }
 
         /// <summary>
@@ -110,7 +146,14 @@ namespace PBDesk.EFRepository
         /// <returns></returns>
         public bool Contains<T>(System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : class
         {
-            return context.Set<T>().Count<T>(predicate) > 0;
+            try
+            {
+                return context.Set<T>().Count<T>(predicate) > 0;
+            }
+            catch (Exception ex)
+            {
+                throw new EFRepositoryException("Error while reading data from database via DbContext.", "Repository.Contains(predicate)", ex);
+            }
         }
 
         /// <summary>
@@ -120,7 +163,14 @@ namespace PBDesk.EFRepository
         /// <returns></returns>
         public T Find<T>(params object[] keys) where T : class
         {
-            return (T)context.Set<T>().Find(keys);
+            try
+            {
+                return (T)context.Set<T>().Find(keys);
+            }
+            catch (Exception ex)
+            {
+                throw new EFRepositoryException("Error while reading data from database via DbContext.", "Repository.Find(keys)", ex);
+            }
         }
 
         /// <summary>
@@ -130,19 +180,34 @@ namespace PBDesk.EFRepository
         /// <returns></returns>
         public T Find<T>(System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : class
         {
-            return context.Set<T>().FirstOrDefault<T>(predicate);
+            try
+            {
+                return context.Set<T>().FirstOrDefault<T>(predicate);
+            }
+            catch (Exception ex)
+            {
+                throw new EFRepositoryException("Error while reading data from database via DbContext.", "Repository.Find(predicate)", ex);
+            }
+            
         }
 
         /// <summary>
         /// Create/Insert a new object to database.
         /// </summary>
-        /// <param name="t">Specified a new object to create.</param>
+        /// <param name="obj">Specified a new object to create.</param>
         /// <returns></returns>
-        public T Insert<T>(T t) where T : class
+        public T Insert<T>(T obj) where T : class
         {
-            var newEntry = context.Set<T>().Add(t);
-            SaveChanges();
-            return newEntry;
+            try
+            {
+                var newEntry = context.Set<T>().Add(obj);
+                SaveChanges();
+                return newEntry;
+            }
+            catch(Exception ex)
+            {
+                throw new EFRepositoryException("Error while inserting data to database via DbContext.", "Repository.Insert(obj)", ex);
+            }
         }
 
         /// <summary>
@@ -151,18 +216,32 @@ namespace PBDesk.EFRepository
         /// <param name="t">Specified a existing object to delete.</param>
         public int Delete<T>(object id) where T : class
         {
-            DeleteLite(id);  //context.Set<T>().Remove(GetSingle<T>(id));
-            return SaveChanges();
+            try
+            {
+                DeleteLite(id);  //context.Set<T>().Remove(GetSingle<T>(id));
+                return SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new EFRepositoryException("Error while deleting data from database via DbContext.", "Repository.Delete(id)", ex);
+            }
         }
 
         /// <summary>
         /// Delete the object from database.
         /// </summary>
-        /// <param name="t">Specified a existing object to delete.</param>
-        public int Delete<T>(T t) where T : class
+        /// <param name="obj">Specified a existing object to delete.</param>
+        public int Delete<T>(T obj) where T : class
         {
-            DeleteLite<T>(t); // context.Set<T>().Remove(t);
-            return SaveChanges();
+            try
+            {
+                DeleteLite<T>(obj); // context.Set<T>().Remove(t);
+                return SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new EFRepositoryException("Error while deleting data from database via DbContext.", "Repository.Delete(obj)", ex);
+            }
         }
 
         /// <summary>
@@ -172,28 +251,37 @@ namespace PBDesk.EFRepository
         /// <returns></returns>
         public int Delete<T>(System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : class
         {
-            //var objects = Filter<T>(predicate);
-            //foreach (var obj in objects)
-            //{
-            //    context.Set<T>().Remove(obj);
-            //}
-            DeleteLite<T>(predicate);
-            return SaveChanges();
+            try
+            {
+                DeleteLite<T>(predicate);
+                return SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new EFRepositoryException("Error while deleting data from database via DbContext.", "Repository.Delete(predicate)", ex);
+            }
         }
 
         /// <summary>
         /// Update object changes and save to database.
         /// </summary>
-        /// <param name="t">Specified the object to save.</param>
+        /// <param name="obj">Specified the object to save.</param>
         /// <returns></returns>
-        public int Update<T>(T t) where T : class
+        public int Update<T>(T obj, string primaryKeyName = "Id") where T : class
         {
-            if (UpdateLite<T>(t) == true)
+            try
             {
-                return context.SaveChanges();
+                if (UpdateLite<T>(obj) == true)
+                {
+                    return context.SaveChanges();
+                }
+                else
+                    return 0;
             }
-            else
-                return 0;
+            catch (Exception ex)
+            {
+                throw new EFRepositoryException("Error while updating data to database via DbContext.", "Repository.Update(obj, primaryKeyName)", ex);
+            }
 
         }
 
@@ -230,52 +318,83 @@ namespace PBDesk.EFRepository
 
         public void DeleteLite<T>(object id) where T : class
         {
-            context.Set<T>().Remove(GetSingle<T>(id));
+            try
+            {
+                context.Set<T>().Remove(GetSingle<T>(id));
+            }
+            catch (Exception ex)
+            {
+                throw new EFRepositoryException("Error while deleting data from database via DbContext.", "Repository.DeleteLite(id)", ex);
+            }
         }
 
-        public void DeleteLite<T>(T t) where T : class
+        public void DeleteLite<T>(T obj) where T : class
         {
-            context.Set<T>().Remove(t);
+            try
+            {
+                context.Set<T>().Remove(obj);
+            }
+            catch (Exception ex)
+            {
+                throw new EFRepositoryException("Error while deleting data from database via DbContext.", "Repository.DeleteLite(obj)", ex);
+            }
         }
 
         public void DeleteLite<T>(Expression<Func<T, bool>> predicate) where T : class
         {
-            var objects = Filter<T>(predicate);
-            foreach (var obj in objects)
-            {
-                context.Set<T>().Remove(obj);
-            }
-        }
-
-
-        public void InsertLite<T>(T t) where T : class
-        {
-            context.Set<T>().Add(t);
-        }
-
-        public bool UpdateLite<T>(T t) where T : class
-        {
-            bool success = false;
-            if (t == null)
-            {
-                throw new ArgumentException("Cannot add a null entity.");
-            }
             try
             {
+                var objects = Filter<T>(predicate);
+                foreach (var obj in objects)
+                {
+                    context.Set<T>().Remove(obj);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new EFRepositoryException("Error while deleting data from database via DbContext.", "Repository.DeleteLite(predicate)", ex);
+            }
+        }
 
 
-                var entry = context.Entry<T>(t);
+        public void InsertLite<T>(T obj) where T : class
+        {
+            try
+            {
+                context.Set<T>().Add(obj);
+            }
+            catch (Exception ex)
+            {
+                throw new EFRepositoryException("Error while inserting data to database via DbContext.", "Repository.InsertLite(obj)", ex);
+            }
+        }
+
+        public bool UpdateLite<T>(T obj, string primaryKeyName = "Id") where T : class
+        {
+            bool success = false;
+            try
+            {
+                if (String.IsNullOrWhiteSpace(primaryKeyName))
+                {
+                    primaryKeyName = "Id";
+                }
+                if (obj == null)
+                {
+                    throw new ArgumentException("Cannot add or update a null entity.");
+                }
+
+                var entry = context.Entry<T>(obj);
 
                 if (entry.State == EntityState.Detached)
                 {
                     var set = context.Set<T>();
-                    var pkey = set.Create().GetType().GetProperty("Id").GetValue(t);
+                    var pkey = set.Create().GetType().GetProperty(primaryKeyName).GetValue(obj);
                     T attachedEntity = set.Find(pkey);  // You need to have access to key
 
                     if (attachedEntity != null)
                     {
                         var attachedEntry = context.Entry(attachedEntity);
-                        attachedEntry.CurrentValues.SetValues(t);
+                        attachedEntry.CurrentValues.SetValues(obj);
                     }
                     else
                     {
@@ -286,17 +405,15 @@ namespace PBDesk.EFRepository
             }
             catch (OptimisticConcurrencyException ex)
             {
-                throw ex;
+                success = false;
+                throw new EFRepositoryException("Error while updating data to database via DbContext. OptimisticConcurrencyException.", "Repository.UpdateLite(obj, primaryKeyName)", ex);
             }
             catch (Exception ex)
             {
                 success = false;
-                //throw ex;
+                throw new EFRepositoryException("Error while updating data to database via DbContext.", "Repository.UpdateLite(obj, primaryKeyName)", ex);
             }
             return success;
-            //var entry = context.Entry(t);
-            //context.Set<T>().Attach(t);
-            //entry.State = EntityState.Modified;
         }
     }
 }
